@@ -1,0 +1,11 @@
+{
+  "name": "subnet-be",
+  "version": "1.0.0",
+  "description": "A RESTful API backend for a social news platform, built with Node.js. This API provides core functionality for user management, article publishing, commenting, voting and topic-based organization.",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}
