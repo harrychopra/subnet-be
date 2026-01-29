@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "dotenv": "16.4.5",
-    "pg": "^8.18.0"
+    "pg": "^8.18.0",
+    "pg-format": "^1.0.4"
   },
   "scripts": {
     "db:create": "docker exec -i pg14 psql -U root < ./db/db-create.sql",
