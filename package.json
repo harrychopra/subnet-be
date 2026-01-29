@@ -7,11 +7,18 @@
   "author": "",
   "license": "ISC",
   "type": "module",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "jest-extended": "^7.0.0",
+    "jest-sorted": "^1.0.15"
+  },
   "dependencies": {
     "dotenv": "16.4.5",
     "pg": "^8.18.0"
   },
   "scripts": {
-    "db:create": "docker exec -i pg14 psql -U root < ./db/db-create.sql"
+    "db:create": "docker exec -i pg14 psql -U root < ./db/db-create.sql",
+    "test": "NODE_OPTIONS='--no-warnings --experimental-vm-modules' node --experimental-vm-modules node_modules/jest/bin/jest.js"
   }
 }
