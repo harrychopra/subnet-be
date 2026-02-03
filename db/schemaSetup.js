@@ -1,6 +1,6 @@
 import db from './db.js';
 
-export default setupSchema = async () => {
+export default async () => {
   const schemaQueries = [
     `DROP INDEX IF EXISTS idx_comments_author`,
 
