@@ -22,6 +22,7 @@
   "scripts": {
     "db:create": "docker exec -i pg14 psql -U root < ./db/db-create.sql",
     "db:seed": "node ./db/seed-dev.js",
-    "test": "NODE_OPTIONS='--no-warnings --experimental-vm-modules' node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "NODE_OPTIONS='--no-warnings --experimental-vm-modules' node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "prepare": "husky"
   }
 }
