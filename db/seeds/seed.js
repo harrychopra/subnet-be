@@ -1,9 +1,9 @@
 import format from 'pg-format';
-import db from './db.js';
-import setupSchema from './schemaSetup.js';
+import db from '../db.js';
+import createSchema from '../migration/create-schema.js';
 
 async function importSeedData() {
-  const seedDataPath = `./seed-data/${process.env.NODE_ENV}/index.js`;
+  const seedDataPath = `./data/${process.env.NODE_ENV}/index.js`;
   return await import(seedDataPath);
 }
 
@@ -32,7 +32,7 @@ async function insertData(table, data) {
 
 async function seed() {
   try {
-    await setupSchema();
+    await createSchema();
 
     const { default: { topics, users, articles, comments } } =
       await importSeedData();

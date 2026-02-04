@@ -1,4 +1,4 @@
-import { findTopics } from '../service/topic.service.js';
+import { findTopics } from '../services/topic.service.js';
 
 export const getTopics = async (req, res) => {
   const topics = await findTopics();

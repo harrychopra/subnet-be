@@ -1,5 +1,5 @@
-import db from '../db/db.js';
-import seed from '../db/seed.js';
+import db from '../../db/db.js';
+import seed from '../../db/seeds/seed.js';
 
 beforeEach(() => seed());
 

@@ -1,7 +1,7 @@
 import request from 'supertest';
-import app from '../app.js';
-import db from '../db/db.js';
-import seed from '../db/seed.js';
+import db from '../../db/db.js';
+import seed from '../../db/seeds/seed.js';
+import app from '../../src/app.js';
 
 beforeEach(async () => await seed());
 afterAll(() => db.end());
