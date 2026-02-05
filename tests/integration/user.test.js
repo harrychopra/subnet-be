@@ -2,6 +2,7 @@ import request from 'supertest';
 import db from '../../db/db.js';
 import seed from '../../db/seeds/seed.js';
 import app from '../../src/app.js';
+import { testMethodNotAllowed } from './test-utils/test-errors.js';
 
 beforeEach(() => seed());
 afterAll(() => db.end());
@@ -32,17 +33,5 @@ describe('/api/users', () => {
     });
   });
 
-  describe('Method not allowed', () => {
-    const methods = ['post', 'put', 'patch', 'delete'];
-
-    for (const method of methods) {
-      const methodName = method.toUpperCase();
-      test(`rejects ${methodName} requests with 405`, async () => {
-        const resp = await request(app)[method]('/api/users').expect(405);
-
-        const { body: { error } } = resp;
-        expect(error).toBe(`Method ${methodName} not allowed`);
-      });
-    }
-  });
+  describe('Method not allowed', () => testMethodNotAllowed('/api/users'));
 });
