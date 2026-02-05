@@ -9,7 +9,6 @@ export function handleMethodNotValid(req, res) {
 }
 
 export function handleError(err, req, res, next) {
-  console.log(err);
   if (err.operational) {
     return res.status(err.status).json({ error: err.message });
   }
