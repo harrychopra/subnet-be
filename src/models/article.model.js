@@ -17,3 +17,11 @@ export const findAll = async () => {
   const { rows } = await db.query(query);
   return rows;
 };
+
+export const findById = async articleId => {
+  const { rows } = await db.query(
+    `select * from articles where article_id = $1`,
+    [articleId]
+  );
+  return rows[0];
+};
