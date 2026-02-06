@@ -2,7 +2,10 @@ import request from 'supertest';
 import db from '../../db/db.js';
 import seed from '../../db/seeds/seed.js';
 import app from '../../src/app.js';
-import { testMethodNotAllowed } from './test-utils/test-errors.js';
+import {
+  testInvalidId,
+  testMethodNotAllowed
+} from './test-utils/test-errors.js';
 
 beforeEach(() => seed());
 afterAll(() => db.end());
@@ -42,15 +45,7 @@ describe('/api/articles/:article_id', () => {
       expect(error).toBe('Article id not found');
     });
     test('returns 400 with a message when id is invalid', async () => {
-      const ids = [0, -1, 'abc'];
-      const requests = ids.map(async id => {
-        const resp = await request(app).get(`/api/articles/${id}`).expect(400);
-
-        const { body: { error } } = resp;
-        expect(error).toBe('Invalid article id/ format');
-      });
-
-      await Promise.all(requests);
+      await testInvalidId('/api/articles/:id');
     });
   });
 
@@ -124,16 +119,7 @@ describe('/api/articles/:article_id/comments', () => {
       expect(error).toBe('Article id not found');
     });
     test('returns 400 with a message when id is invalid', async () => {
-      const ids = [0, -1, 'abc'];
-      const requests = ids.map(async id => {
-        const resp = await request(app).get(`/api/articles/${id}/comments`)
-          .expect(400);
-
-        const { body: { error } } = resp;
-        expect(error).toBe('Invalid article id/ format');
-      });
-
-      await Promise.all(requests);
+      await testInvalidId('/api/articles/:id/comments');
     });
   });
 
