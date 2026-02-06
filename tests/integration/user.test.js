@@ -7,8 +7,8 @@ import { testMethodNotAllowed } from './test-utils/test-errors.js';
 beforeEach(() => seed());
 afterAll(() => db.end());
 
-describe('/api/users', () => {
-  describe('GET', () => {
+describe('Users', () => {
+  describe('GET: /api/users', () => {
     test('returns all users', async () => {
       const resp = await request(app).get('/api/users').expect(200);
       const { body: { users } } = resp;
