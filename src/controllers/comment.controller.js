@@ -1,12 +1,11 @@
 import { ValidationError } from '../errors.js';
 import { findCommentsByArticleId } from '../services/comment.service.js';
+import { isValidId } from './utils/helper.js';
 
 export const getCommentsByArticle = async (req, res) => {
   const { articleId } = req.params;
 
-  const id = parseInt(articleId, 10);
-
-  if (isNaN(id) || id < 1) {
+  if (!isValidId(articleId)) {
     throw new ValidationError('Invalid article id/ format');
   }
 

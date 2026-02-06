@@ -3,6 +3,7 @@ import {
   findArticleById,
   findArticles
 } from '../services/article.service.js';
+import { isValidId } from './utils/helper.js';
 
 export const getArticles = async (_, res) => {
   const articles = await findArticles();
@@ -13,9 +14,7 @@ export const getArticles = async (_, res) => {
 export const getArticle = async (req, res) => {
   const { articleId } = req.params;
 
-  const id = parseInt(articleId, 10);
-
-  if (isNaN(id) || id < 1) {
+  if (!isValidId(articleId)) {
     throw new ValidationError('Invalid article id/ format');
   }
 
