@@ -25,3 +25,16 @@ export const findById = async articleId => {
   );
   return rows[0];
 };
+
+export const idExists = async articleId => {
+  const { rows } = await db.query(
+    `--sql
+    select exists(
+        select 1 from articles
+        where article_id = $1
+    )`,
+    [articleId]
+  );
+
+  return rows[0];
+};
