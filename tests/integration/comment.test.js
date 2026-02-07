@@ -159,24 +159,26 @@ describe('Comments', () => {
     test('returns 400 with a message when required fields are missing', async () => {
       const articleId = 1;
       const url = `/api/articles/${articleId}/comments`;
-      const payload1 = {};
-      const resp1 = await request(app).post(url).send(payload1).expect(400);
-      const { body: { error: error1 } } = resp1;
-      expect(error1).toBe('Invalid input: username, body');
 
-      const payload2 = { username: 'icellusedkars' };
-      const resp2 = await request(app).post(url).send(payload2).expect(400);
-      const { body: { error: error2 } } = resp2;
-      expect(error2).toBe(
-        'Invalid input: body'
-      );
+      const testData = [
+        { payload: {}, expError: 'Invalid input: username, body' },
+        {
+          payload: { username: 'icellusedkars' },
+          expError: 'Invalid input: body'
+        },
+        {
+          payload: { body: 'At least the lighting in consistent' },
+          expError: 'Invalid input: username'
+        }
+      ];
 
-      const payload3 = { body: 'At least the lighting in consistent' };
-      const resp3 = await request(app).post(url).send(payload3).expect(400);
-      const { body: { error: error3 } } = resp3;
-      expect(error3).toBe(
-        'Invalid input: username'
-      );
+      for (const data of testData) {
+        const resp = await request(app).post(url).send(data.payload).expect(
+          400
+        );
+        const { body: { error } } = resp;
+        expect(error).toBe(data.expError);
+      }
     });
     test('returns 400 when article id is not a valid number', async () => {
       await testInvalidId('/api/articles/:id/comments', 'post');
