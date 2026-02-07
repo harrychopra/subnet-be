@@ -38,3 +38,16 @@ export const articleExists = async articleId => {
 
   return rows[0];
 };
+
+export const updateVotes = async ({ articleId, inc_votes }) => {
+  const { rows } = await db.query(
+    `--sql
+    update articles
+    set votes = votes + $1
+    where article_id = $2
+    returning *
+  `,
+    [inc_votes, articleId]
+  );
+  return rows[0];
+};

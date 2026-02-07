@@ -1,5 +1,9 @@
 import express from 'express';
-import { getArticle, getArticles } from '../controllers/article.controller.js';
+import {
+  getArticle,
+  getArticles,
+  updateArticleVotes
+} from '../controllers/article.controller.js';
 import {
   addComment,
   getCommentsByArticle
@@ -14,6 +18,7 @@ router.route('/')
 
 router.route('/:articleId')
   .get(getArticle)
+  .patch(updateArticleVotes)
   .all(handleMethodNotValid);
 
 router.route('/:articleId/comments')

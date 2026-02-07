@@ -48,6 +48,68 @@ describe('Article', () => {
       await testInvalidId('/api/articles/:id');
     });
   });
+  describe('PATCH: /api/articles/:article_id', () => {
+    test('updates article\'s votes with status 200', async () => {
+      const payload = { inc_votes: 10 };
+      await request(app).patch('/api/articles/1')
+        .send(payload)
+        .expect(200);
+    });
+    test('returns article with all the props and updated votes', async () => {
+      const articleId = 1;
+      // Article for reference
+      const resp = await request(app).get(`/api/articles/${articleId}`);
+      const origArticle = resp.body.article;
 
-  describe('Method not allowed', () => testMethodNotAllowed('/api/articles/1'));
+      const payload = { inc_votes: 10 };
+      const resp2 = await request(app)
+        .patch(`/api/articles/${articleId}`)
+        .send(payload);
+
+      const updArticle = resp2.body.article;
+      expect(updArticle.article_id).toBe(origArticle.article_id);
+      expect(updArticle.title).toBe(origArticle.title);
+      expect(updArticle.topic).toBe(origArticle.topic);
+      expect(updArticle.author).toBe(origArticle.author);
+      expect(updArticle.body).toBe(origArticle.body);
+      expect(updArticle.created_at).toBe(origArticle.created_at);
+      expect(updArticle.votes).toBe(origArticle.votes + payload.inc_votes);
+      expect(updArticle.article_img_url).toBe(origArticle.article_img_url);
+    });
+    test('returns 404 with a message when article does not exist', async () => {
+      const payload = { inc_votes: 10 };
+      const resp = await request(app).patch('/api/articles/100')
+        .send(payload)
+        .expect(404);
+
+      const { body: { error } } = resp;
+      expect(error).toBe('Article id not found');
+    });
+    test('returns 400 with a message when request has missing or invalid fields', async () => {
+      const articleId = 1;
+      const url = `/api/articles/${articleId}`;
+
+      const testData = [
+        { payload: {}, expError: 'Invalid input: inc_votes' },
+        {
+          payload: { inc_votes: 'ten' },
+          expError: 'Invalid input: inc_votes'
+        }
+      ];
+
+      for (const data of testData) {
+        const resp = await request(app).patch(url).send(data.payload)
+          .expect(400);
+
+        const { body: { error } } = resp;
+        expect(error).toBe(data.expError);
+      }
+    });
+    test('returns 400 with a message when article id is invalid', async () => {
+      await testInvalidId('/api/articles/:id', 'patch');
+    });
+  });
+
+  describe('Method not allowed', () =>
+    testMethodNotAllowed('/api/articles/1', ['post', 'put', 'delete']));
 });
