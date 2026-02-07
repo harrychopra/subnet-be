@@ -16,12 +16,12 @@ export function testMethodNotAllowed(
   }
 }
 
-export async function testInvalidId(endpoint) {
+export async function testInvalidId(endpoint, method = 'get') {
   const ids = [0, -1, 'abc'];
 
   const requests = ids.map(async id => {
     const url = endpoint.replace(':id', id);
-    const resp = await request(app).get(url).expect(400);
+    const resp = await request(app)[method](url).expect(400);
 
     const { body: { error } } = resp;
     expect(error).toBe('Invalid article id/ format');

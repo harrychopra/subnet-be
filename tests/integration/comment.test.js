@@ -76,11 +76,117 @@ describe('Comments', () => {
       const { body: { error } } = resp;
       expect(error).toBe('Article id not found');
     });
-    test('returns 400 with a message when id is invalid', async () => {
+    test('returns 400 with a message when article id is invalid', async () => {
       await testInvalidId('/api/articles/:id/comments');
     });
   });
 
+  describe('POST: /api/articles/:article_id/comments', () => {
+    test('responds with correct status code', async () => {
+      const articleId = 1;
+      const url = `/api/articles/${articleId}/comments`;
+      const payload = {
+        username: 'icellusedkars',
+        body: 'At least the lighting in consistent'
+      };
+
+      await request(app).post(url).send(payload).expect(201);
+    });
+    test('responds with newly created comment with correct props and values', async () => {
+      const articleId = 1;
+      const url = `/api/articles/${articleId}/comments`;
+      // username: 'SecondPlaceForever',
+      const payload = {
+        username: 'icellusedkars',
+        body: 'At least the lighting in consistent'
+      };
+      const requestTime = Date.now();
+
+      const resp = await request(app).post(url).send(payload);
+
+      const { body: { comment } } = resp;
+      const { comment_id, article_id, body, votes, author, created_at } =
+        comment;
+
+      expect(comment_id).toBeGreaterThan(0);
+      expect(article_id).toBe(articleId);
+      expect(body).toBe(payload.body);
+      expect(author).toBe(payload.username);
+      expect(votes).toBe(0);
+      const createdTime = new Date(created_at).getTime();
+      expect(createdTime).toBeGreaterThan(requestTime);
+    });
+    test('persists comment to database', async () => {
+      const articleId = 1;
+      const url = `/api/articles/${articleId}/comments`;
+      const payload = {
+        username: 'icellusedkars',
+        body: 'At least the lighting in consistent'
+      };
+
+      // Get the last row id from the comments table
+      const { rows } = await db.query(`--sql
+        select comment_id
+        from comments
+        order by comment_id desc
+        limit 1
+        `);
+
+      const { comment_id: lastRowId } = rows[0];
+
+      const resp = await request(app).post(url).send(payload);
+
+      const { body: { comment } } = resp;
+      const { comment_id, article_id, body, votes, author } = comment;
+      expect(comment_id).toBe(lastRowId + 1);
+      expect(article_id).toBe(articleId);
+      expect(body).toBe(payload.body);
+      expect(author).toBe(payload.username);
+      expect(votes).toBe(0);
+    });
+    test('returns 404 with a message when article does not exist', async () => {
+      const payload = {
+        username: 'icellusedkars',
+        body: 'At least the lighting in consistent'
+      };
+      const resp = await request(app).post('/api/articles/100/comments').send(
+        payload
+      ).expect(404);
+
+      const { body: { error } } = resp;
+      expect(error).toBe('Article id not found');
+    });
+    test('returns 400 with a message when required fields are missing', async () => {
+      const articleId = 1;
+      const url = `/api/articles/${articleId}/comments`;
+      const payload1 = {};
+      const resp1 = await request(app).post(url).send(payload1).expect(400);
+      const { body: { error: error1 } } = resp1;
+      expect(error1).toBe('Invalid input: username, body');
+
+      const payload2 = { username: 'icellusedkars' };
+      const resp2 = await request(app).post(url).send(payload2).expect(400);
+      const { body: { error: error2 } } = resp2;
+      expect(error2).toBe(
+        'Invalid input: body'
+      );
+
+      const payload3 = { body: 'At least the lighting in consistent' };
+      const resp3 = await request(app).post(url).send(payload3).expect(400);
+      const { body: { error: error3 } } = resp3;
+      expect(error3).toBe(
+        'Invalid input: username'
+      );
+    });
+    test('returns 400 when article id is not a valid number', async () => {
+      await testInvalidId('/api/articles/:id/comments', 'post');
+    });
+  });
+
   describe('Method not allowed', () =>
-    testMethodNotAllowed('/api/articles/1/comments'));
+    testMethodNotAllowed('/api/articles/1/comments', [
+      'put',
+      'patch',
+      'delete'
+    ]));
 });

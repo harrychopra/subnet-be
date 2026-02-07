@@ -1,5 +1,5 @@
 import { NotFoundError } from '../errors.js';
-import { findAll, findById, idExists } from '../models/article.model.js';
+import { articleExists, findAll, findById } from '../models/article.model.js';
 
 export const findArticles = () => {
   return findAll();
@@ -14,6 +14,6 @@ export const findArticleById = async articleId => {
 };
 
 export const checkArticleExists = async articleId => {
-  const { exists } = await idExists(articleId);
+  const { exists } = await articleExists(articleId);
   if (!exists) throw new NotFoundError('Article id not found');
 };

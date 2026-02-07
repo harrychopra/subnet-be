@@ -19,7 +19,8 @@
     "dotenv": "16.4.5",
     "express": "^5.2.1",
     "pg": "^8.18.0",
-    "pg-format": "^1.0.4"
+    "pg-format": "^1.0.4",
+    "zod": "^4.3.6"
   },
   "scripts": {
     "db:create": "docker exec -i pg14 psql -U root < ./db/migration/create-dbs.sql",
