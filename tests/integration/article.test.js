@@ -45,7 +45,7 @@ describe('Article', () => {
       expect(error).toBe('Article id not found');
     });
     test('returns 400 with a message when id is invalid', async () => {
-      await testInvalidId('/api/articles/:id');
+      await testInvalidId('/api/articles/:id', 'article');
     });
   });
   describe('PATCH: /api/articles/:article_id', () => {
@@ -138,7 +138,7 @@ describe('Article', () => {
       }
     });
     test('returns 400 with a message when article id is invalid', async () => {
-      await testInvalidId('/api/articles/:id', 'patch');
+      await testInvalidId('/api/articles/:id', 'article', 'patch');
     });
   });
 

@@ -24,3 +24,25 @@ export const insert = async comment => {
   const { rows } = await db.query(query);
   return rows[0];
 };
+
+export const commentExists = async commentId => {
+  const { rows } = await db.query(
+    `--sql
+    select exists(
+        select 1 from comments
+        where comment_id = $1
+    )`,
+    [commentId]
+  );
+  return rows[0];
+};
+
+export const deleteById = async commentId => {
+  const result = await db.query(
+    `--sql
+      delete from comments
+      where comment_id = $1`,
+    [commentId]
+  );
+  return result.rowCount;
+};

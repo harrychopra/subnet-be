@@ -2,7 +2,8 @@ import { ValidationError } from '../errors.js';
 import { addCommentSchema } from '../schemas/comment.schema.js';
 import {
   createComment,
-  findCommentsByArticleId
+  findCommentsByArticleId,
+  removeComment
 } from '../services/comment.service.js';
 import { formatZodErrors, isValidId } from './utils/helper.js';
 
@@ -37,4 +38,19 @@ export const addComment = async (req, res) => {
 
   const comment = await createComment(payload);
   res.status(201).json({ comment });
+};
+
+export const deleteComment = async (req, res) => {
+  const { commentId } = req.params;
+
+  if (!isValidId(commentId)) {
+    throw new ValidationError('Invalid comment id/ format');
+  }
+
+  const hasRemoved = await removeComment(commentId);
+  if (!hasRemoved) {
+    throw new Error(`Failed to delete comment id ${commentId}`);
+  }
+
+  res.status(204).send();
 };
