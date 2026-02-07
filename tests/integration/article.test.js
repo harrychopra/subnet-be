@@ -76,6 +76,38 @@ describe('Article', () => {
       expect(updArticle.votes).toBe(origArticle.votes + payload.inc_votes);
       expect(updArticle.article_img_url).toBe(origArticle.article_img_url);
     });
+    test('persists updated article to database', async () => {
+      const articleId = 1;
+      const url = `/api/articles/${articleId}`;
+      const payload = { inc_votes: 10 };
+
+      // Get the article's vote count before update
+      const { rows } = await db.query(
+        `--sql
+        select votes
+        from articles
+        where article_id = $1
+        `,
+        [articleId]
+      );
+
+      const origVotes = rows[0]['votes'];
+
+      await request(app).patch(url).send(payload);
+
+      const { rows: records } = await db.query(
+        `--sql
+        select votes
+        from articles
+        where article_id = $1
+        `,
+        [articleId]
+      );
+
+      const updVotes = records[0]['votes'];
+
+      expect(updVotes).toBe(origVotes + payload.inc_votes);
+    });
     test('returns 404 with a message when article does not exist', async () => {
       const payload = { inc_votes: 10 };
       const resp = await request(app).patch('/api/articles/100')
