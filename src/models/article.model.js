@@ -1,7 +1,9 @@
+import format from 'pg-format';
 import db from '../../db/db.js';
 
-export const findAll = async () => {
-  const query = `--sql
+export const findAll = async ({ sort_by, order }) => {
+  const query = format(
+    `--sql
     select a.title, a.topic, a.author, a.votes, a.article_img_url, a.created_at,
         coalesce(c.comment_count, 0)
     from articles as a
@@ -11,8 +13,10 @@ export const findAll = async () => {
         group by article_id
     ) as c
     on c.article_id = a.article_id
-    order by a.created_at desc
-    `;
+    order by %I  %s`,
+    sort_by,
+    order
+  );
 
   const { rows } = await db.query(query);
   return rows;
@@ -27,27 +31,30 @@ export const findById = async articleId => {
 };
 
 export const articleExists = async articleId => {
-  const { rows } = await db.query(
+  const query = format(
     `--sql
     select exists(
         select 1 from articles
-        where article_id = $1
+        where article_id = %L
     )`,
-    [articleId]
+    articleId
   );
+  const { rows } = await db.query(query);
 
   return rows[0];
 };
 
 export const updateVotes = async ({ articleId, inc_votes }) => {
-  const { rows } = await db.query(
+  const query = format(
     `--sql
     update articles
-    set votes = votes + $1
-    where article_id = $2
+    set votes = votes + %L
+    where article_id = %L
     returning *
   `,
-    [inc_votes, articleId]
+    inc_votes,
+    articleId
   );
+  const { rows } = await db.query(query);
   return rows[0];
 };

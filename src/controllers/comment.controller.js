@@ -25,18 +25,15 @@ export const addComment = async (req, res) => {
     throw new ValidationError('Invalid article id/ format');
   }
 
-  const result = addCommentSchema.safeParse(req.body);
-  if (!result.success) {
-    const message = formatZodErrors(result);
+  const { data, success, error } = addCommentSchema.safeParse(req.body);
+  if (!success) {
+    const message = formatZodErrors(error);
     throw new ValidationError(message);
   }
 
-  const payload = {
-    articleId,
-    ...result.data
-  };
+  data.articleId = articleId;
 
-  const comment = await createComment(payload);
+  const comment = await createComment(data);
   res.status(201).json({ comment });
 };
 

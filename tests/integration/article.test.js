@@ -12,13 +12,66 @@ afterAll(() => db.end());
 
 describe('Articles', () => {
   describe('GET: /api/articles', () => {
-    test('returns all articles', async () => {
+    test('returns all articles with 200 when no filters applied', async () => {
       const resp = await request(app).get('/api/articles').expect(200);
 
       const { body: { articles } } = resp;
       expect(articles).toBeArray();
       expect(articles.length).toBeGreaterThan(0);
     });
+    test('sorts by created_at descending by default', async () => {
+      const resp = await request(app).get('/api/articles');
+
+      const { body: { articles } } = resp;
+      expect(articles).toBeSorted({ descending: true, key: 'created_at' });
+    });
+    test('accepts sort_by query param and sorts by the given prop (default descending)', async () => {
+      const props = [
+        'topic',
+        'author',
+        'created_at',
+        'votes'
+      ];
+
+      for (const prop of props) {
+        const resp = await request(app).get(`/api/articles?sort_by=${prop}`)
+          .expect(200);
+        const { body: { articles } } = resp;
+        expect(articles).toBeSorted({ descending: true, key: prop });
+      }
+    });
+    test('accepts both sort_by and order query parameters', async () => {
+      const props = [
+        'topic',
+        'author',
+        'created_at',
+        'votes'
+      ];
+
+      const orders = ['asc', 'desc'];
+
+      for (const order of orders) {
+        for (const prop of props) {
+          const resp = await request(app)
+            .get(`/api/articles?sort_by=${prop}&order=${order}`)
+            .expect(200);
+
+          const { body: { articles } } = resp;
+          expect(articles).toBeSorted({
+            descending: order === 'desc',
+            key: prop
+          });
+        }
+      }
+    });
+  });
+  test('returns 400 with a message when query params are invalid', async () => {
+    const resp = await request(app).get(
+      '/api/articles?sort_by=xyz&order=oldest'
+    ).expect(400);
+
+    const { body: { error } } = resp;
+    expect(error).toBe('Invalid input: sort_by, order');
   });
 
   describe('Method not allowed', () => testMethodNotAllowed('/api/articles'));

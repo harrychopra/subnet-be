@@ -6,9 +6,7 @@ import {
   updateVotes
 } from '../models/article.model.js';
 
-export const findArticles = () => {
-  return findAll();
-};
+export const findArticles = qParams => findAll(qParams);
 
 export const findArticleById = async articleId => {
   const article = await findById(articleId);

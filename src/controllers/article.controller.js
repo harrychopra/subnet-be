@@ -1,5 +1,8 @@
 import { ValidationError } from '../errors.js';
-import { updateArticleVotesSchema } from '../schemas/article.schema.js';
+import {
+  articleSortByQuerySchema,
+  updateArticleVotesSchema
+} from '../schemas/article.schema.js';
 import {
   findArticleById,
   findArticles,
@@ -7,9 +10,16 @@ import {
 } from '../services/article.service.js';
 import { formatZodErrors, isValidId } from './utils/helper.js';
 
-export const getArticles = async (_, res) => {
-  const articles = await findArticles();
+export const getArticles = async (req, res) => {
+  const { data: qParams, success, error } = articleSortByQuerySchema
+    .safeParse(req.query);
 
+  if (!success) {
+    const message = formatZodErrors(error);
+    throw new ValidationError(message);
+  }
+
+  const articles = await findArticles(qParams);
   res.status(200).json({ articles });
 };
 
@@ -31,14 +41,14 @@ export const updateArticleVotes = async (req, res) => {
     throw new ValidationError('Invalid article id/ format');
   }
 
-  const result = updateArticleVotesSchema.safeParse(req.body);
-  if (!result.success) {
-    const message = formatZodErrors(result);
+  const { data, success, error } = updateArticleVotesSchema.safeParse(req.body);
+  if (!success) {
+    const message = formatZodErrors(error);
     throw new ValidationError(message);
   }
 
-  const payload = { ...result.data, articleId };
+  data.articleId = articleId;
 
-  const article = await updateArticleVotesService(payload);
+  const article = await updateArticleVotesService(data);
   res.status(200).json({ article });
 };
