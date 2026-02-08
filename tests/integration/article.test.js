@@ -19,6 +19,28 @@ describe('Articles', () => {
       expect(articles).toBeArray();
       expect(articles.length).toBeGreaterThan(0);
     });
+
+    test('returns each article with correct props', async () => {
+      const resp = await request(app).get('/api/articles');
+
+      const { body: { articles } } = resp;
+      articles.forEach(article =>
+        expect(article)
+          .toContainAllKeys([
+            'title',
+            'topic',
+            'votes',
+            'author',
+            'article_img_url',
+            'created_at',
+            'comment_count'
+          ])
+      );
+
+      const hasComments = articles.some(article => article.comment_count > 0);
+      expect(hasComments).toBe(true);
+    });
+
     test('sorts by created_at descending by default', async () => {
       const resp = await request(app).get('/api/articles');
 
