@@ -2,7 +2,7 @@
   "name": "subnet-be",
   "version": "1.0.0",
   "description": "A RESTful API backend for a social news platform, built with Node.js. This API provides core functionality for user management, article publishing, commenting, voting and topic-based organization.",
-  "main": "index.js",
+  "main": "src/listen.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -24,8 +24,10 @@
   },
   "scripts": {
     "db:create": "docker exec -i pg14 psql -U root < ./db/migration/create-dbs.sql",
-    "db:seed": "node ./db/seeds/seed-dev.js",
+    "seed:dev": "node ./db/seeds/seed-env.js",
+    "seed:prod": "NODE_ENV=production node ./db/seeds/seed-env.js",
+    "prepare": "husky",
     "test": "NODE_OPTIONS='--no-warnings --experimental-vm-modules' jest",
-    "prepare": "husky"
+    "start": "node src/listen.js"
   }
 }
