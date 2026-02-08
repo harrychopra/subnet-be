@@ -1,9 +1,8 @@
 import format from 'pg-format';
 import db from '../../db/db.js';
 
-export const findAll = async ({ sort_by, order }) => {
-  const query = format(
-    `--sql
+export const findAll = async ({ sort_by, order, topic }) => {
+  const query = `--sql
     select a.title, a.topic, a.author, a.votes, a.article_img_url, a.created_at,
         coalesce(c.comment_count, 0)
     from articles as a
@@ -13,12 +12,12 @@ export const findAll = async ({ sort_by, order }) => {
         group by article_id
     ) as c
     on c.article_id = a.article_id
-    order by %I  %s`,
-    sort_by,
-    order
-  );
+    where (a.topic = $1 or $1 is null)
+    order by ${sort_by} ${order}`;
+  // Combination of str interpolation and parameterized queries
+  // Safe as long as controller safe lists incoming sort_by & order
 
-  const { rows } = await db.query(query);
+  const { rows } = await db.query(query, [topic]);
   return rows;
 };
 

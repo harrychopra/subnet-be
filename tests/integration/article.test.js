@@ -25,7 +25,7 @@ describe('Articles', () => {
       const { body: { articles } } = resp;
       expect(articles).toBeSorted({ descending: true, key: 'created_at' });
     });
-    test('accepts sort_by query param and sorts by the given prop (default descending)', async () => {
+    test('accepts sort_by param and sorts by the given prop (default descending)', async () => {
       const props = [
         'topic',
         'author',
@@ -40,7 +40,7 @@ describe('Articles', () => {
         expect(articles).toBeSorted({ descending: true, key: prop });
       }
     });
-    test('accepts both sort_by and order query parameters', async () => {
+    test('accepts both sort_by and order parameters', async () => {
       const props = [
         'topic',
         'author',
@@ -64,17 +64,52 @@ describe('Articles', () => {
         }
       }
     });
-  });
-  test('returns 400 with a message when query params are invalid', async () => {
-    const resp = await request(app).get(
-      '/api/articles?sort_by=xyz&order=oldest'
-    ).expect(400);
 
-    const { body: { error } } = resp;
-    expect(error).toBe('Invalid input: sort_by, order');
-  });
+    test('returns 400 with a message when params are invalid', async () => {
+      const resp = await request(app).get(
+        '/api/articles?sort_by=xyz&order=oldest'
+      ).expect(400);
 
-  describe('Method not allowed', () => testMethodNotAllowed('/api/articles'));
+      const { body: { error } } = resp;
+      expect(error).toBe('Invalid input: sort_by, order');
+    });
+
+    test('accepts topic param and returns filtered articles by given topic', async () => {
+      // Get topics
+      const resp = await request(app).get('/api/topics').expect(200);
+      const { body: { topics } } = resp;
+      expect(topics).toBeArray();
+      expect(topics.length).toBeGreaterThan(0);
+
+      for (const topic of topics) {
+        const resp = await request(app).get(`/api/articles?topic=${topic}`)
+          .expect(200);
+
+        const { body: { articles } } = resp;
+        const hasOtherTopic = articles.some(article => article.topic !== topic);
+        expect(hasOtherTopic).toBeFalse();
+      }
+    });
+
+    test('return empty array of articles when topic does\'t exist', async () => {
+      const resp = await request(app).get(`/api/articles?topic=xyz`)
+        .expect(200);
+
+      const { body: { articles } } = resp;
+      expect(articles).toBeArrayOfSize(0);
+    });
+
+    test('returns 404 with a message when query params are invalid', async () => {
+      const resp = await request(app).get(
+        '/api/articles?sort_by=xyz&order=oldest'
+      ).expect(400);
+
+      const { body: { error } } = resp;
+      expect(error).toBe('Invalid input: sort_by, order');
+    });
+
+    describe('Method not allowed', () => testMethodNotAllowed('/api/articles'));
+  });
 });
 
 describe('Article', () => {
