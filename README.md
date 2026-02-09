@@ -1,5 +1,7 @@
 # Subnet - A reddit style app (but better)
 
+[https://subnet-be.onrender.com]()
+
 A RESTful API backend for a social news platform, built with Node.js. This API provides core functionality for user management, article publishing, commenting, voting and topic-based organization.
 
 ## Features
@@ -16,3 +18,7 @@ A RESTful API backend for a social news platform, built with Node.js. This API p
 - **Database:** PostgreSQL
 - **Authentication:**
 - **Validation:**
+
+## Schema
+
+![Entity Relationship Diagram](./assets/erd.png "Entity Relationship Diagram")
