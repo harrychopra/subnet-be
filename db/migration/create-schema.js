@@ -64,6 +64,7 @@ export default async () => {
       await db.query(query);
     }
   } catch (err) {
-    throw new Error(`Schema creation failed: ${err}`);
+    console.error('Schema creation failed:', err);
+    throw err;
   }
 };

@@ -64,7 +64,7 @@ async function seed() {
 
     await insertData('comments', commentsWithArticleId);
   } catch (err) {
-    console.error(err);
+    console.error('Seeding failed:', err);
     throw err;
   }
 }
