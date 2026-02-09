@@ -1,9 +1,11 @@
 import { ValidationError } from '../errors.js';
 import { addCommentSchema } from '../schemas/comment.schema.js';
+import { updateVotesSchema } from '../schemas/common.schema.js';
 import {
   createComment,
   findCommentsByArticleId,
-  removeComment
+  removeComment,
+  updateCommentVotes as updateCommentVotesService
 } from '../services/comment.service.js';
 import { formatZodErrors, isValidId } from './utils/helper.js';
 
@@ -50,4 +52,21 @@ export const deleteComment = async (req, res) => {
   }
 
   res.status(204).send();
+};
+
+export const updateCommentVotes = async (req, res) => {
+  const { commentId } = req.params;
+  if (!isValidId(commentId)) {
+    throw new ValidationError('Invalid comment id/ format');
+  }
+
+  const { data, success, error } = updateVotesSchema.safeParse(req.body);
+  if (!success) {
+    const message = formatZodErrors(error);
+    throw new ValidationError(message);
+  }
+
+  data.commentId = commentId;
+  const comment = await updateCommentVotesService(data);
+  res.status(200).json({ comment });
 };

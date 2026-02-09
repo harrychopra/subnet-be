@@ -46,3 +46,18 @@ export const deleteById = async commentId => {
   );
   return result.rowCount;
 };
+
+export const updateVotes = async ({ commentId, inc_votes }) => {
+  const query = format(
+    `--sql
+    update comments
+    set votes = votes + %L
+    where comment_id = %L
+    returning *
+  `,
+    inc_votes,
+    commentId
+  );
+  const { rows } = await db.query(query);
+  return rows[0];
+};

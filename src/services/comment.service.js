@@ -3,7 +3,8 @@ import {
   commentExists,
   deleteById,
   findAllByArticleId,
-  insert
+  insert,
+  updateVotes
 } from '../models/comment.model.js';
 import { checkArticleExists } from './article.service.js';
 
@@ -26,4 +27,9 @@ export const removeComment = async commentId => {
   await checkCommentExists(commentId);
   const rowAffected = await deleteById(commentId);
   return rowAffected === 1;
+};
+
+export const updateCommentVotes = async payload => {
+  await checkCommentExists(payload.commentId);
+  return updateVotes(payload);
 };

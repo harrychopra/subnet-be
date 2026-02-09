@@ -217,13 +217,110 @@ describe('\nComments', () => {
         await testInvalidId('/api/comments/:id', 'comment', 'delete');
       });
     });
+    describe('PATCH: /api/comments/:comment_id', () => {
+      test('updates comment\'s votes with status 200', async () => {
+        const payload = { inc_votes: 10 };
+        await request(app).patch('/api/comments/1')
+          .send(payload)
+          .expect(200);
+      });
+      test('returns comment with all the props and updated votes', async () => {
+        const commentId = 1;
+        // Comment for reference
+        const { rows } = await db.query(
+          `--sql
+        select *
+        from comments
+        where comment_id = $1
+        `,
+          [commentId]
+        );
+
+        const origComment = rows[0];
+
+        const payload = { inc_votes: 10 };
+        const resp = await request(app)
+          .patch(`/api/comments/${commentId}`)
+          .send(payload);
+
+        const updComment = resp.body.comment;
+        expect(updComment.comment_id).toBe(origComment.comment_id);
+        expect(updComment.article_id).toBe(origComment.article_id);
+        expect(updComment.body).toBe(origComment.body);
+        expect(updComment.author).toBe(origComment.author);
+        expect(updComment.votes).toBe(origComment.votes + payload.inc_votes);
+      });
+      test('persists updated comment to database', async () => {
+        const commentId = 1;
+        const url = `/api/comments/${commentId}`;
+        const payload = { inc_votes: 10 };
+
+        // Get the comment's vote count before update
+        const { rows } = await db.query(
+          `--sql
+        select votes
+        from comments
+        where comment_id = $1
+        `,
+          [commentId]
+        );
+
+        const origVotes = rows[0]['votes'];
+
+        await request(app).patch(url).send(payload);
+
+        const { rows: records } = await db.query(
+          `--sql
+        select votes
+        from comments
+        where comment_id = $1
+        `,
+          [commentId]
+        );
+
+        const updVotes = records[0]['votes'];
+
+        expect(updVotes).toBe(origVotes + payload.inc_votes);
+      });
+      test('returns 404 with a message when comment does not exist', async () => {
+        const payload = { inc_votes: 10 };
+        const resp = await request(app).patch('/api/comments/100')
+          .send(payload)
+          .expect(404);
+
+        const { body: { error } } = resp;
+        expect(error).toBe('Comment id not found');
+      });
+      test('returns 400 with a message when request has missing or invalid fields', async () => {
+        const commentId = 1;
+        const url = `/api/comments/${commentId}`;
+
+        const testData = [
+          { payload: {}, expError: 'Invalid input: inc_votes' },
+          {
+            payload: { inc_votes: 'ten' },
+            expError: 'Invalid input: inc_votes'
+          }
+        ];
+
+        for (const data of testData) {
+          const resp = await request(app).patch(url).send(data.payload)
+            .expect(400);
+
+          const { body: { error } } = resp;
+          expect(error).toBe(data.expError);
+        }
+      });
+      test('returns 400 with a message when comment id is invalid', async () => {
+        await testInvalidId('/api/comments/:id', 'comment', 'patch');
+      });
+    });
 
     describe('Method not allowed', () =>
       testMethodNotAllowed('/api/comments/1', [
         'get',
         'post',
-        'put',
-        'patch'
+        'put'
       ]));
   });
 });

@@ -1,8 +1,8 @@
 import { ValidationError } from '../errors.js';
 import {
-  articleSortByQuerySchema,
-  updateArticleVotesSchema
+  articleSortByQuerySchema
 } from '../schemas/article.schema.js';
+import { updateVotesSchema } from '../schemas/common.schema.js';
 import {
   findArticleById,
   findArticles,
@@ -41,7 +41,7 @@ export const updateArticleVotes = async (req, res) => {
     throw new ValidationError('Invalid article id/ format');
   }
 
-  const { data, success, error } = updateArticleVotesSchema.safeParse(req.body);
+  const { data, success, error } = updateVotesSchema.safeParse(req.body);
   if (!success) {
     const message = formatZodErrors(error);
     throw new ValidationError(message);
