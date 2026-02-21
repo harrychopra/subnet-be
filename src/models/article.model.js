@@ -7,7 +7,7 @@ export const findAll = async ({ sort_by, order, topic }) => {
         coalesce(c.comment_count, 0) as comment_count
     from articles as a
     left join (
-        select article_id, count(*) as comment_count
+        select article_id, count(*)::int as comment_count
         from comments
         group by article_id
     ) as c
