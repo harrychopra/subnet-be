@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 import { handleError, handleNotFound } from './middleware/error.middleware.js';
 import {
@@ -9,6 +10,7 @@ import {
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/topics', topicRouter);
