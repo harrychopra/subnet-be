@@ -3,7 +3,7 @@ import db from '../../db/db.js';
 
 export const findAll = async ({ sort_by, order, topic }) => {
   const query = `--sql
-    select a.title, a.topic, a.author, a.votes, a.article_img_url, a.created_at,
+    select a.article_id, a.title, a.topic, a.author, a.votes, a.article_img_url, a.created_at,
         coalesce(c.comment_count, 0) as comment_count
     from articles as a
     left join (

@@ -27,6 +27,7 @@ describe('Articles', () => {
       articles.forEach(article =>
         expect(article)
           .toContainAllKeys([
+            'article_id',
             'title',
             'topic',
             'votes',
