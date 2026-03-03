@@ -5,6 +5,7 @@ export const articleSortByQuerySchema = z.object({
     'topic',
     'author',
     'created_at',
+    'comment_count',
     'votes'
   ]).default('created_at').optional(),
   order: z.enum(['asc', 'desc']).default('desc').optional(),

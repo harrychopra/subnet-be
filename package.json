@@ -29,6 +29,7 @@
     "seed:prod": "NODE_ENV=production node ./db/seeds/seed-env.js",
     "prepare": "husky",
     "test": "NODE_OPTIONS='--no-warnings --experimental-vm-modules' jest",
-    "start": "node src/listen.js"
+    "dev": "node ./src/listen.js",
+    "start": "NODE_ENV=production node src/listen.js"
   }
 }
